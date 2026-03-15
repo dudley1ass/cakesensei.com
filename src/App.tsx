@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ChevronDown, Plus, Trash2, ArrowLeft, Search, X } from 'lucide-react';
+import { ChevronDown, Plus, Trash2, ArrowLeft, Search, X, Printer } from 'lucide-react';
 
 import { Ingredient, RecipeIngredient, MeasurementMode } from './types/cake';
 import { CakeType, CakeRecipe, cakeTypes } from './types/cakeTypes';
@@ -739,6 +739,8 @@ export default function App() {
   const [coverageStyle, setCoverageStyle] = useState<CoverageStyle>('full');
   const [coverageShape] = useState<'round' | 'square'>('round');
 
+  const handlePrint = () => window.print();
+
   const selectType = (type: CakeType) => {
     setSelectedType(type);
     setSelectedRecipeName(null);
@@ -892,8 +894,15 @@ export default function App() {
               </div>
             </div>
 
-            {/* Controls */}
-            <div className="flex items-center gap-2 flex-wrap">
+            {/* Controls — hidden when printing */}
+            <div className="flex items-center gap-2 flex-wrap print:hidden">
+              {/* Print button */}
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-all border border-white/30"
+              >
+                <Printer className="w-3.5 h-3.5" /> Print
+              </button>
               {/* Pantry finder */}
               <button
                 onClick={() => setShowPantry(true)}
@@ -1247,8 +1256,8 @@ export default function App() {
 
           {/* RIGHT — Tabs */}
           <div>
-            {/* Tab nav */}
-            <div className="flex bg-white rounded-2xl shadow-sm p-1 mb-4">
+            {/* Tab nav — hidden when printing */}
+            <div className="flex bg-white rounded-2xl shadow-sm p-1 mb-4 print:hidden">
               {(['metrics', 'nutrition', 'baking'] as const).map((tab) => (
                 <button
                   key={tab}
@@ -1261,9 +1270,11 @@ export default function App() {
               ))}
             </div>
 
-            {/* Tab content */}
-            {activeTab === 'metrics' && <MetricsDisplay metrics={metrics} icingMetrics={icingMetrics} combinedMetrics={combinedMetrics} />}
-            {activeTab === 'nutrition' && (
+            {/* Tab content — active tab on screen; ALL tabs visible when printing */}
+            <div className={activeTab === 'metrics' ? 'block' : 'hidden print:block'}>
+              <MetricsDisplay metrics={metrics} icingMetrics={icingMetrics} combinedMetrics={combinedMetrics} />
+            </div>
+            <div className={activeTab === 'nutrition' ? 'block' : 'hidden print:block'}>
               <NutritionFacts
                 metrics={metrics}
                 icingMetrics={icingMetrics}
@@ -1271,8 +1282,8 @@ export default function App() {
                 servingSize={Math.round(metrics.totalWeight / servings)}
                 servingsPerRecipe={servings}
               />
-            )}
-            {activeTab === 'baking' && (
+            </div>
+            <div className={activeTab === 'baking' ? 'block' : 'hidden print:block'}>
               <BakingInstructions
                 cakeTypeId={selectedType.id}
                 totalWeight={metrics.totalWeight}
@@ -1282,7 +1293,7 @@ export default function App() {
                 icingName={selectedIcingName}
                 hasIcing={icingRecipe.length > 0}
               />
-            )}
+            </div>
           </div>
         </div>
       </main>

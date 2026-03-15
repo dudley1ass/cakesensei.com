@@ -186,6 +186,37 @@ export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics }: Metri
         </div>
       </div>
 
+      {/* ── Cake Science Articles ── */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+          <span>📚</span> Cake Science Deep Dives
+        </h3>
+        <p className="text-xs text-gray-400 mb-4">Curious why things go wrong? Read the science behind common cake problems.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {[
+            { emoji: '🏔️', label: 'Why Cakes Dome',         url: 'https://senseifood.com/cake-science/why-cakes-dome' },
+            { emoji: '💥', label: 'Why Cakes Collapse',     url: 'https://senseifood.com/cake-science/why-cakes-collapse' },
+            { emoji: '🕳️', label: 'Why Cakes Sink',         url: 'https://senseifood.com/cake-science/why-cakes-sink' },
+            { emoji: '⚡', label: 'Why Cakes Crack on Top', url: 'https://senseifood.com/cake-science/why-cakes-crack-on-top' },
+            { emoji: '🧱', label: 'Why Cakes Are Dense',    url: 'https://senseifood.com/cake-science/why-cakes-are-dense' },
+            { emoji: '🍳', label: 'Why Cakes Stick to Pan', url: 'https://senseifood.com/cake-science/why-cakes-stick-to-pan' },
+            { emoji: '🏜️', label: 'Why Cakes Dry Out',      url: 'https://senseifood.com/cake-science/why-cakes-dry-out' },
+          ].map(({ emoji, label, url }) => (
+            <a
+              key={url}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-gray-100 hover:border-red-200 hover:bg-red-50 transition-all group"
+            >
+              <span className="text-base">{emoji}</span>
+              <span className="text-sm text-gray-700 group-hover:text-red-700 font-medium">{label}</span>
+              <span className="ml-auto text-gray-300 group-hover:text-red-400 text-xs">↗</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 }

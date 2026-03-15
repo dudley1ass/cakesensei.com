@@ -7,3 +7,47 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
+
+/* ── Print styles ─────────────────────────────────────────── */
+@media print {
+  /* Hide everything interactive */
+  header button,
+  .no-print,
+  [role="dialog"] {
+    display: none !important;
+  }
+
+  /* Remove backgrounds and shadows to save ink */
+  * {
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  /* Layout: single column, full width */
+  main .max-w-6xl {
+    display: block !important;
+    max-width: 100% !important;
+  }
+
+  /* Left column (ingredients) and right column (tabs) */
+  main .max-w-6xl > div {
+    width: 100% !important;
+    margin-bottom: 24px;
+  }
+
+  /* Show all tabs at once when printing */
+  .print-show-all-tabs {
+    display: block !important;
+  }
+
+  /* Page break hints */
+  .bg-white.rounded-2xl {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
