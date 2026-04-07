@@ -10,6 +10,22 @@ body {
 
 /* ── Print styles ─────────────────────────────────────────── */
 @media print {
+  @page {
+    margin: 12mm;
+  }
+
+  /* Document-only output — not a framed “web page” */
+  .app-print-root {
+    background: white !important;
+    background-image: none !important;
+    min-height: unset !important;
+  }
+
+  /* Hide shell chrome; content in main only */
+  .app-print-header {
+    display: none !important;
+  }
+
   /* Hide everything interactive */
   header button,
   .no-print,
@@ -25,6 +41,21 @@ body {
   }
 
   body {
+    background: white !important;
+  }
+
+  main.container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Recipe / icing panels: plain document blocks */
+  .print-clean-panel {
+    border: 1px solid #333 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     background: white !important;
   }
 

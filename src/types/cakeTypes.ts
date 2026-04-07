@@ -3,6 +3,8 @@ export interface CakeType {
   name: string;
   emoji: string;
   category: string;
+  /** When this cake system is the right choice (conversion / clarity). */
+  bestFor: string;
   description: string;
   characteristics: string[];
   scienceNote: string;
@@ -50,6 +52,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Butter Cake',
     emoji: '🧈',
     category: 'Classic',
+    bestFor: 'Birthdays, layer cakes, and classic American butter recipes.',
     description: 'Made with creamed butter and sugar — the gold standard of classic cake baking.',
     characteristics: ['Rich', 'Dense to medium', 'Butter flavor'],
     examples: ['Pound Cake', 'White Cake', 'Silver Cake', 'Golden Cake'],
@@ -412,6 +415,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Foam / Sponge Cake',
     emoji: '🌬️',
     category: 'Classic',
+    bestFor: 'Light, airy sponges, roulades, genoise, and European-style layers.',
     description: 'Leavened entirely by whipped eggs — no butter, no chemical leavening. Light, airy, and elegant.',
     characteristics: ['Very light', 'Airy', 'Egg-forward'],
     examples: ['Sponge Cake', 'Lady Cake', 'Savory Cake', 'Fancy Cake'],
@@ -585,6 +589,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Chiffon Cake',
     emoji: '🌀',
     category: 'Classic',
+    bestFor: 'Tall, moist, airy cakes — hybrid oil + egg-white lift.',
     description: 'A lighter variant of sponge cake — uses oil for moisture and whipped egg whites for lift. Invented in the 1920s.',
     characteristics: ['Moist', 'Light', 'Tender crumb'],
     examples: ['Classic Chiffon', 'Lemon Chiffon', 'Orange Chiffon'],
@@ -714,6 +719,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Oil Cake',
     emoji: '🫙',
     category: 'Classic',
+    bestFor: 'Super-moist cakes that stay tender for days — sheet cakes, snack cakes, carrot, and chiffon-style oil batters.',
     description: 'Uses liquid fat instead of creamed butter — stays moist for days and develops flavor as it sits.',
     characteristics: ['Very moist', 'Dense', 'Keeps well'],
     examples: ['Huckleberry Cake', 'Coffee Cake', 'Loaf Cake'],
@@ -860,6 +866,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Flourless Cake',
     emoji: '🍫',
     category: 'Modern',
+    bestFor: 'Gluten-free guests, dense celebration cakes, and intense chocolate or nut-forward desserts.',
     description: 'No flour — relies on chocolate, almond flour, or eggs for structure. Dense, fudgy, and intensely flavored.',
     characteristics: ['Dense', 'Fudgy', 'Gluten-free'],
     examples: ['Flourless Chocolate', 'Almond Torte'],
@@ -984,6 +991,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Cheesecake',
     emoji: '🧀',
     category: 'Classic',
+    bestFor: 'Creamy, sliceable desserts — make-ahead entertaining and anytime you want custard-set richness.',
     description: 'A dense, custard-like cake built on cream cheese or fresh cheese. Rich, tangy, and creamy.',
     characteristics: ['Dense', 'Creamy', 'Tangy'],
     examples: ['Classic Cheesecake', 'New York Style'],
@@ -1093,6 +1101,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Ice Cream Cake',
     emoji: '🍨',
     category: 'Modern',
+    bestFor: 'Frozen celebration cakes, kids’ parties, and summer desserts with cold + cake in one slice.',
     description: 'Cake layers with ice cream — baked thin, cooled, then assembled with frozen filling.',
     characteristics: ['Frozen', 'Layered', 'Celebratory'],
     examples: ['Jelly Layer Cake', 'Ice Cream Layer Cake'],
@@ -1156,6 +1165,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Layer Cake',
     emoji: '🎂',
     category: 'Classic',
+    bestFor: 'Stacked celebration cakes, weddings, and anytime you want drama + filling between tiers.',
     description: 'Multiple thin layers stacked with fillings — the American celebration cake.',
     characteristics: ['Tall', 'Layered', 'Festive'],
     examples: ['Chocolate Layer Cake', 'Coconut Layer Cake', 'Lemon Currant Cake'],
@@ -1372,6 +1382,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Specialty Cake',
     emoji: '✨',
     category: 'Classic',
+    bestFor: 'Regional classics, spiced and fruit cakes, gingerbread, and bakes with distinctive methods.',
     description: 'Unique cakes with distinctive methods — spice cakes, fruit cakes, gingerbread, and molasses-based cakes.',
     characteristics: ['Unique method', 'Bold flavors', 'Keeps well'],
     examples: ['Fruit Cake', 'Coffee Cake', 'Gingerbread', 'Spice Cake', 'Loaf Cake'],
@@ -1643,6 +1654,7 @@ export const cakeTypes: CakeType[] = [
     name: 'Small Cakes',
     emoji: '🧁',
     category: 'Classic',
+    bestFor: 'Tea cakes, cupcakes, and smaller batches without committing to a full layer cake.',
     description: 'Individual cakes baked in cups or small tins — the original cupcakes and tea cakes.',
     characteristics: ['Individual', 'Small', 'Quick to bake'],
     examples: ['Cup Cake', 'Coconut Cakes', 'Almond Macaroons'],

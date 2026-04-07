@@ -865,9 +865,12 @@ export default function App() {
   }, {});
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #fdf6e3 0%, #fce4ec 50%, #f3e5f5 100%)' }}>
-      {/* Header */}
-      <header className="text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c, #e67e22)' }}>
+    <div
+      className="min-h-screen app-print-root"
+      style={{ background: 'linear-gradient(135deg, #fdf6e3 0%, #fce4ec 50%, #f3e5f5 100%)' }}
+    >
+      {/* Header — hidden when printing (recipe title lives in print block in main) */}
+      <header className="app-print-header text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c, #e67e22)' }}>
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3">
@@ -946,7 +949,7 @@ export default function App() {
             </div>
 
           {/* ── Cake Ingredient Editor ── */}
-          <div className="bg-white rounded-2xl shadow-md p-5">
+          <div className="bg-white rounded-2xl shadow-md p-5 print-clean-panel">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900">🧪 Cake Ingredients</h2>
               <button
@@ -1042,7 +1045,7 @@ export default function App() {
           </div>
 
           {/* ── Icing Panel ── */}
-          <div className="bg-white rounded-2xl shadow-md p-5">
+          <div className="bg-white rounded-2xl shadow-md p-5 print-clean-panel">
             {/* Header row with expand toggle */}
             <div className="flex items-center justify-between mb-4">
               <button
