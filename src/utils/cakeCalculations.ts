@@ -677,3 +677,60 @@ export function getScoreColor(score: number): string {
   if (score < 75) return '#fbbf24';
   return '#f87171';
 }
+
+// ─── Baker's % (flour = 100%) ─────────────────────────────────
+/** Treated as % of flour like other ingredients, not part of the 100% flour baseline. */
+const NOT_IN_FLOUR_BASE_IDS = new Set<string>([
+  'cocoa-natural',
+  'cocoa-dutch',
+  'espresso-powder',
+  'matcha-powder',
+]);
+
+export function getWheatFlourBaseGrams(recipe: RecipeIngredient[]): number {
+  return recipe.reduce((sum, ri) => {
+    if (ri.category !== 'flour') return sum;
+    if (NOT_IN_FLOUR_BASE_IDS.has(ri.id)) return sum;
+    return sum + ri.amount;
+  }, 0);
+}
+
+export interface BakerPercentRow {
+  name: string;
+  grams: number;
+  bakerPct: number;
+}
+
+export interface BakerPercentResult {
+  rows: BakerPercentRow[];
+  /** Grams that equal 100% in the table (wheat-flour sum, or total batch if flourless) */
+  baseGrams: number;
+  /** When true, percentages are classic baker's (all ingredients vs wheat-type flour). */
+  hasFlourBase: boolean;
+}
+
+/**
+ * Structural flour (AP, cake, nut flours, cornstarch in flour category, etc.) = 100%.
+ * Cocoa, matcha, espresso are excluded from the baseline but shown as % of that flour.
+ * If there is no such flour (flourless), each ingredient is % of total batch weight (sums to 100%).
+ */
+export function computeBakersPercents(recipe: RecipeIngredient[]): BakerPercentResult {
+  const flourBase = getWheatFlourBaseGrams(recipe);
+  const totalGrams = recipe.reduce((s, r) => s + r.amount, 0);
+  const hasFlourBase = flourBase > 0;
+  const divisor = hasFlourBase ? flourBase : (totalGrams > 0 ? totalGrams : 1);
+
+  const rows: BakerPercentRow[] = recipe
+    .map((ri) => ({
+      name: ri.name,
+      grams: ri.amount,
+      bakerPct: (ri.amount / divisor) * 100,
+    }))
+    .sort((a, b) => b.bakerPct - a.bakerPct);
+
+  return {
+    rows,
+    baseGrams: hasFlourBase ? flourBase : totalGrams,
+    hasFlourBase,
+  };
+}

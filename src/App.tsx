@@ -1282,6 +1282,8 @@ export default function App() {
                 icingMetrics={icingMetrics}
                 combinedMetrics={combinedMetrics}
                 measurementMode={mode}
+                cakeRecipe={recipe}
+                icingRecipe={icingRecipe}
               />
             </div>
             <div className={`${activeTab === 'nutrition' ? 'block' : 'hidden print:block'} print:order-1`}>

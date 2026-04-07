@@ -1,12 +1,67 @@
 import { useState, useEffect } from 'react';
-import { CakeMetrics } from '../types/cake';
-import { getScoreLabel, getScoreColor } from '../utils/cakeCalculations';
+import { CakeMetrics, RecipeIngredient } from '../types/cake';
+import { getScoreLabel, getScoreColor, computeBakersPercents, BakerPercentResult } from '../utils/cakeCalculations';
 
 interface MetricsDisplayProps {
   metrics: CakeMetrics;
   icingMetrics?: CakeMetrics | null;
   combinedMetrics?: CakeMetrics | null;
   measurementMode?: 'metric' | 'imperial' | 'volumetric';
+  cakeRecipe: RecipeIngredient[];
+  icingRecipe?: RecipeIngredient[];
+}
+
+function BakerPercentTable({
+  result,
+  formatWeight,
+}: {
+  result: BakerPercentResult;
+  formatWeight: (g: number) => string;
+}) {
+  if (result.rows.length === 0) {
+    return (
+      <p className="text-sm text-gray-400 italic py-2">No ingredients in this part of the recipe.</p>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-gray-50 border-b border-gray-200 text-left">
+            <th className="px-3 py-2 font-semibold text-gray-700">Ingredient</th>
+            <th className="px-3 py-2 font-semibold text-gray-700 text-right">Weight</th>
+            <th className="px-3 py-2 font-semibold text-gray-700 text-right">Baker&apos;s %</th>
+          </tr>
+        </thead>
+        <tbody>
+          {result.rows.map((row, i) => (
+            <tr key={`${row.name}-${i}`} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/80">
+              <td className="px-3 py-1.5 text-gray-800">{row.name}</td>
+              <td className="px-3 py-1.5 text-right text-gray-600 tabular-nums">{formatWeight(row.grams)}</td>
+              <td className="px-3 py-1.5 text-right font-medium text-gray-900 tabular-nums">
+                {row.bakerPct < 0.05 ? row.bakerPct.toFixed(2) : row.bakerPct.toFixed(1)}%
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="px-3 py-2 bg-gray-50/90 border-t border-gray-200 text-xs text-gray-600">
+        {result.hasFlourBase ? (
+          <>
+            <span className="font-medium text-gray-700">100% = </span>
+            {formatWeight(result.baseGrams)} structural flour
+            <span className="text-gray-400"> (cocoa, matcha, espresso counted as % of that flour, not in the 100% total).</span>
+          </>
+        ) : (
+          <>
+            <span className="font-medium text-gray-700">No wheat-flour baseline — </span>
+            100% = {formatWeight(result.baseGrams)} total batch; rows sum to 100%.
+          </>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function ScoreBar({ label, score, emoji }: { label: string; score: number; emoji: string }) {
@@ -38,7 +93,10 @@ function PredictionRow({ icon, label, value }: { icon: string; label: string; va
   );
 }
 
-export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics, measurementMode = 'metric' }: MetricsDisplayProps) {
+export function MetricsDisplay({
+  metrics, icingMetrics, combinedMetrics, measurementMode = 'metric',
+  cakeRecipe, icingRecipe = [],
+}: MetricsDisplayProps) {
   const formatWeight = (grams: number) => {
     if (measurementMode === 'imperial') {
       if (grams >= 453.592) return `${(grams / 453.592).toFixed(2)} lb`;
@@ -68,6 +126,9 @@ export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics, measure
     { label: 'Sugar',  value: activeMetrics.sugarRatio,  color: '#f472b6' },
     { label: 'Liquid', value: activeMetrics.liquidRatio, color: '#60a5fa' },
   ];
+
+  const cakeBaker = computeBakersPercents(cakeRecipe);
+  const icingBaker = icingRecipe.length > 0 ? computeBakersPercents(icingRecipe) : null;
 
   const tasteScores = [
     { label: 'Chocolate',  score: activeMetrics.chocolateScore,  emoji: '🍫' },
@@ -180,6 +241,51 @@ export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics, measure
         ))}
       </div>
 
+      {/* ── Baker's % (full formula) ── */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+          <span>⚖️</span> Baker&apos;s Percentages
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">
+          Professional formula view: structural flour = 100%; cocoa and similar dry flavors are % of that flour. Flourless recipes use % of total batch.
+        </p>
+
+        {effectiveView === 'cake' && (
+          <>
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">🎂 Cake batter</div>
+            <BakerPercentTable result={cakeBaker} formatWeight={formatWeight} />
+          </>
+        )}
+
+        {effectiveView === 'icing' && (
+          <>
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">🧁 Icing / frosting</div>
+            {icingBaker ? (
+              <BakerPercentTable result={icingBaker} formatWeight={formatWeight} />
+            ) : (
+              <p className="text-sm text-gray-400 italic py-2">Add icing ingredients to see baker&apos;s percentages.</p>
+            )}
+          </>
+        )}
+
+        {effectiveView === 'combined' && (
+          <div className="space-y-6">
+            <div>
+              <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">🎂 Cake batter</div>
+              <BakerPercentTable result={cakeBaker} formatWeight={formatWeight} />
+            </div>
+            {icingBaker ? (
+              <div>
+                <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">🧁 Icing / frosting</div>
+                <BakerPercentTable result={icingBaker} formatWeight={formatWeight} />
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400 italic">No icing on this build — only cake batter is shown above.</p>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* ── Qualitative Predictions ── */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -189,7 +295,7 @@ export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics, measure
           <PredictionRow icon="🌾" label="Gluten Development" value={activeMetrics.glutenDevelopment} />
           <PredictionRow icon="⬆️" label="Leavening Type"     value={activeMetrics.leavenType} />
           <PredictionRow icon="🧁" label="Predicted Crumb"    value={activeMetrics.predictedCrumb} />
-          <PredictionRow icon="📅" label="Shelf Life"         value={metrics.shelfLife} />
+          <PredictionRow icon="📅" label="Shelf Life"         value={activeMetrics.shelfLife} />
           <PredictionRow icon="🌡️" label="Baking Temp"        value={activeMetrics.bakingTemp} />
           <PredictionRow icon="⚖️" label="Total Weight"       value={formatWeight(activeMetrics.totalWeight)} />
         </div>
