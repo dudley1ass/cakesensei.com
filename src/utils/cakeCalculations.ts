@@ -190,6 +190,10 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
   let leavenChemical = 0;
   let leavenMechanical = 0;
   let leavenEgg = 0;
+  let bakingPowderWeight = 0;
+  let bakingSodaWeight = 0;
+  let creamOfTartarWeight = 0;
+  let acidicSupportWeight = 0;
 
   // Accumulated raw flavour signals (in gram-weighted units)
   const rawSignals: Record<FlavorKey, number> = {
@@ -228,6 +232,10 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
       if (ing.name.toLowerCase().includes('white')) leavenEgg += w;
     }
     if (ing.category === 'leavening') {
+      const lname = ing.name.toLowerCase();
+      if (lname.includes('baking powder')) bakingPowderWeight += w;
+      if (lname.includes('baking soda')) bakingSodaWeight += w;
+      if (lname.includes('cream of tartar')) creamOfTartarWeight += w;
       if (ing.name.toLowerCase().includes('powder') || ing.name.toLowerCase().includes('soda')) {
         leavenChemical += w;
       }
@@ -236,11 +244,29 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
       leavenMechanical += w;
     }
 
+    // Approximate acid support for baking soda (coarse but useful sanity check)
+    const acidName = ing.name.toLowerCase();
+    if (
+      acidName.includes('buttermilk') ||
+      acidName.includes('sour cream') ||
+      acidName.includes('greek yogurt') ||
+      acidName.includes('lemon juice') ||
+      acidName.includes('lime juice') ||
+      acidName.includes('white vinegar') ||
+      acidName.includes('apple cider vinegar') ||
+      acidName.includes('molasses') ||
+      acidName.includes('applesauce') ||
+      acidName.includes('cocoa powder (natural)')
+    ) {
+      acidicSupportWeight += w;
+    }
+
     // Accumulate taste signals
     const signals = TASTE_SIGNALS[ri.id];
     if (signals) {
-      (Object.keys(signals) as FlavorKey[]).forEach((key) => {
-        rawSignals[key] += w * (signals[key] ?? 0);
+      const signalEntries = Object.entries(signals) as [FlavorKey, number | undefined][];
+      signalEntries.forEach(([key, signalWeight]) => {
+        rawSignals[key] += w * (signalWeight ?? 0);
       });
     }
   });
@@ -295,7 +321,7 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
   }
 
   // Taste notes — human-readable sentence
-  let tasteNotes = buildTasteNotes(topFlavors, flavorScores, sweetnessScore, flavorProfile.length);
+  let tasteNotes = buildTasteNotes(topFlavors, sweetnessScore);
 
   // ── Taste warnings — with personality ────────────────────────
   const tasteWarnings: string[] = [];
@@ -443,6 +469,38 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
     tasteWarnings.push('🧈 More fat than flour — incredibly rich. Think financier or kouign-amann territory.');
   }
 
+  // Leavening sanity checks
+  if (flourWeight >= 80) {
+    const bakingPowderPer100Flour = (bakingPowderWeight / flourWeight) * 100;
+    const bakingSodaPer100Flour = (bakingSodaWeight / flourWeight) * 100;
+
+    if (bakingPowderPer100Flour > 5.5) {
+      tasteWarnings.push('⚗️ Leavening looks high for the flour amount — expect coarse crumb, doming, or a metallic/soapy note.');
+    } else if (bakingPowderPer100Flour > 4.5) {
+      tasteWarnings.push('⚗️ On the high side for baking powder — this may rise fast, then collapse if structure lags.');
+    }
+
+    if (bakingSodaPer100Flour > 2.0) {
+      tasteWarnings.push('⚗️ Baking soda is very high relative to flour — likely bitter/soapy unless acidity is strong and intentional.');
+    }
+
+    if (leavenChemical < 1 && leavenEgg < 60 && flourWeight > 180) {
+      tasteWarnings.push('⬇️ Very low leavening for this flour load — expect a tighter, denser crumb unless this is intentionally custardy.');
+    }
+  }
+
+  if (bakingSodaWeight > 0) {
+    if ((acidicSupportWeight + creamOfTartarWeight) < bakingSodaWeight * 10) {
+      tasteWarnings.push('🧪 Baking soda present with weak acid support — crumb may yellow and taste soapy. Add acid (buttermilk/lemon/vinegar) or swap part to baking powder.');
+    }
+    if (creamOfTartarWeight > 0) {
+      const tartarToSoda = creamOfTartarWeight / Math.max(0.1, bakingSodaWeight);
+      if (tartarToSoda < 1.1 || tartarToSoda > 2.8) {
+        tasteWarnings.push('⚖️ Cream of tartar + baking soda ratio looks off — gas production may be uneven. Typical pairing is roughly 1.5-2.5:1 by weight.');
+      }
+    }
+  }
+
   // Science-based warnings (kept but given personality)
   if (flavorScores.bitter > 70) tasteWarnings.push('🍫 Intensely bitter — this needs sugar to balance it, or it\'s a very adult chocolate experience.');
   if (flavorScores.tart   > 80) tasteWarnings.push('🍋 Very tart — your mouth will know exactly what hit it. Balance with sweetness.');
@@ -522,9 +580,7 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
 
 function buildTasteNotes(
   topFlavors: FlavorKey[],
-  scores: Record<FlavorKey, number>,
   sweetnessScore: number,
-  profileLength: number,
 ): string {
   if (topFlavors.length === 0) {
     return sweetnessScore > 50

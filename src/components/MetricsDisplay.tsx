@@ -6,6 +6,7 @@ interface MetricsDisplayProps {
   metrics: CakeMetrics;
   icingMetrics?: CakeMetrics | null;
   combinedMetrics?: CakeMetrics | null;
+  measurementMode?: 'metric' | 'imperial' | 'volumetric';
 }
 
 function ScoreBar({ label, score, emoji }: { label: string; score: number; emoji: string }) {
@@ -37,7 +38,15 @@ function PredictionRow({ icon, label, value }: { icon: string; label: string; va
   );
 }
 
-export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics }: MetricsDisplayProps) {
+export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics, measurementMode = 'metric' }: MetricsDisplayProps) {
+  const formatWeight = (grams: number) => {
+    if (measurementMode === 'imperial') {
+      if (grams >= 453.592) return `${(grams / 453.592).toFixed(2)} lb`;
+      return `${(grams / 28.3495).toFixed(2)} oz`;
+    }
+    return `${grams.toFixed(0)} g`;
+  };
+
   const hasIcing = !!icingMetrics;
   const [view, setView] = useState<'cake' | 'icing' | 'combined'>(hasIcing ? 'combined' : 'cake');
 
@@ -182,7 +191,7 @@ export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics }: Metri
           <PredictionRow icon="🧁" label="Predicted Crumb"    value={activeMetrics.predictedCrumb} />
           <PredictionRow icon="📅" label="Shelf Life"         value={metrics.shelfLife} />
           <PredictionRow icon="🌡️" label="Baking Temp"        value={activeMetrics.bakingTemp} />
-          <PredictionRow icon="⚖️" label="Total Weight"       value={`${activeMetrics.totalWeight.toFixed(0)}g`} />
+          <PredictionRow icon="⚖️" label="Total Weight"       value={formatWeight(activeMetrics.totalWeight)} />
         </div>
       </div>
 

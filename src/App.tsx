@@ -61,17 +61,6 @@ const VOL_UNITS: { value: VolUnit; label: string; toCups: number }[] = [
   { value: 'quarts', label: 'quarts', toCups: 4           },
 ];
 
-function volToGrams(val: number, cat: string, unit: VolUnit): number {
-  const d = DENSITY[cat] ?? DENSITY.default;
-  const u = VOL_UNITS.find(u => u.value === unit)!;
-  return val * u.toCups * d * 236.588;
-}
-function gramsToVol(grams: number, cat: string, unit: VolUnit): number {
-  const d = DENSITY[cat] ?? DENSITY.default;
-  const u = VOL_UNITS.find(u => u.value === unit)!;
-  return grams / (u.toCups * d * 236.588);
-}
-
 // Pick a sensible default unit for a given mode + ingredient
 function bestMetricUnit(grams: number): MetricUnit {
   if (grams < 1) return 'mg';
@@ -1015,7 +1004,7 @@ export default function App() {
                             {preset.optionalAdditions.map((opt, i) => (
                               <div key={i} className="flex items-start gap-1.5 text-xs text-green-800">
                                 <span className="text-green-400 flex-shrink-0 mt-0.5">+</span>
-                                <span><strong>{opt.name}</strong> ({opt.amount}g) — {opt.note}</span>
+                                <span><strong>{opt.name}</strong> ({gramsTo(opt.amount, mode === 'volumetric' ? 'metric' : mode, 'leavening')}) — {opt.note}</span>
                               </div>
                             ))}
                           </div>
@@ -1272,7 +1261,12 @@ export default function App() {
 
             {/* Tab content — active tab on screen; ALL tabs visible when printing */}
             <div className={activeTab === 'metrics' ? 'block' : 'hidden print:block'}>
-              <MetricsDisplay metrics={metrics} icingMetrics={icingMetrics} combinedMetrics={combinedMetrics} />
+              <MetricsDisplay
+                metrics={metrics}
+                icingMetrics={icingMetrics}
+                combinedMetrics={combinedMetrics}
+                measurementMode={mode}
+              />
             </div>
             <div className={activeTab === 'nutrition' ? 'block' : 'hidden print:block'}>
               <NutritionFacts
