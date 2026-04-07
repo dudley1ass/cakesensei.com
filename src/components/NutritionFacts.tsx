@@ -9,6 +9,13 @@ interface NutritionFactsProps {
   servingsPerRecipe: number;
 }
 
+/** Trace trans fat: avoid a misleading hard "0.00g" from rounding */
+function formatTransFatGrams(g: number): string {
+  if (g <= 0) return '0g';
+  if (g < 0.005) return '<0.01g';
+  return `${g.toFixed(2)}g`;
+}
+
 export function NutritionFacts({
   metrics, icingMetrics, combinedMetrics, servingSize, servingsPerRecipe,
 }: NutritionFactsProps) {
@@ -34,18 +41,18 @@ export function NutritionFacts({
     servingSize;
 
   const f           = activeServingSize / 100;
-  const calories    = (active.calories          || 0) * f;
-  const fat         = (active.fat               || 0) * f;
-  const saturated   = (active.saturatedFat      || 0) * f;
-  const trans       = (active.transFat          || 0) * f;
-  const poly        = (active.polyunsaturatedFat|| 0) * f;
-  const mono        = (active.monounsaturatedFat|| 0) * f;
-  const cholesterol = (active.cholesterol       || 0) * f;
-  const carbs       = (active.carbs             || 0) * f;
-  const protein     = (active.protein           || 0) * f;
-  const fiber       = (active.fiber             || 0) * f;
-  const sugar       = (active.sugar             || 0) * f;
-  const sodium      = (active.sodium            || 0) * f;
+  const calories    = (active.calories ?? 0) * f;
+  const fat         = (active.fat ?? 0) * f;
+  const saturated   = (active.saturatedFat ?? 0) * f;
+  const trans       = (active.transFat ?? 0) * f;
+  const poly        = (active.polyunsaturatedFat ?? 0) * f;
+  const mono        = (active.monounsaturatedFat ?? 0) * f;
+  const cholesterol = (active.cholesterol ?? 0) * f;
+  const carbs       = (active.carbs ?? 0) * f;
+  const protein     = (active.protein ?? 0) * f;
+  const fiber       = (active.fiber ?? 0) * f;
+  const sugar       = (active.sugar ?? 0) * f;
+  const sodium      = (active.sodium ?? 0) * f;
   const starch      = Math.max(0, carbs - fiber - sugar);
 
   const fatDV         = (fat         / 78)   * 100;
@@ -75,10 +82,13 @@ export function NutritionFacts({
         </div>
       )}
 
-      <div className="bg-white border-2 border-black p-4 max-w-sm font-sans">
+      <div className="print-nutrition-label bg-white border-2 border-black p-4 max-w-sm font-sans">
         <div className="border-b-8 border-black pb-1">
           <h2 className="text-3xl font-black">Nutrition Facts</h2>
           <p className="text-xs text-gray-500 mt-0.5">{viewLabel}</p>
+          <p className="text-xs font-semibold text-gray-800 mt-2 leading-snug">
+            All values below are <span className="underline">per serving</span> (one slice)—not for the whole cake or batch.
+          </p>
         </div>
 
         <div className="border-b-4 border-black py-1 text-sm">
@@ -90,7 +100,7 @@ export function NutritionFacts({
 
         <div className="border-b-8 border-black py-2">
           <div className="flex justify-between items-end">
-            <span className="font-bold text-lg">Calories</span>
+            <span className="font-bold text-lg">Calories <span className="text-xs font-semibold text-gray-600">(per serving)</span></span>
             <span className="text-4xl font-black">{calories.toFixed(0)}</span>
           </div>
         </div>
@@ -102,7 +112,7 @@ export function NutritionFacts({
         <div className="space-y-0.5 text-sm">
           <NutrRow label="Total Fat"           amount={`${fat.toFixed(1)}g`}         dv={fatDV} />
           <NutrSub label="Saturated Fat"       amount={`${saturated.toFixed(1)}g`}   dv={saturatedDV} />
-          <NutrSub label="Trans Fat"           amount={`${trans.toFixed(2)}g`} />
+          <NutrSub label="Trans Fat"           amount={formatTransFatGrams(trans)} />
           {poly > 0.05 && <NutrSub label="Polyunsaturated Fat" amount={`${poly.toFixed(1)}g`} />}
           {mono > 0.05 && <NutrSub label="Monounsaturated Fat" amount={`${mono.toFixed(1)}g`} />}
           <NutrRow label="Cholesterol"         amount={`${cholesterol.toFixed(0)}mg`} dv={cholesterolDV} />
@@ -114,8 +124,11 @@ export function NutritionFacts({
           <NutrRow label="Protein"             amount={`${protein.toFixed(1)}g`}      dv={proteinDV} />
         </div>
 
-        <div className="border-t-8 border-black mt-2 pt-2 text-xs">
-          * % Daily Values based on a 2,000 calorie diet.
+        <div className="border-t-8 border-black mt-2 pt-2 text-xs space-y-1">
+          <p>* % Daily Values based on a 2,000 calorie diet.</p>
+          <p className="text-gray-600">
+            Trans fat includes <span className="font-medium">natural trans</span> from butter and dairy (ruminant sources), not only industrial partially hydrogenated oils.
+          </p>
         </div>
 
         <div className="mt-3 text-xs text-gray-600 border-t border-gray-300 pt-2 space-y-0.5">

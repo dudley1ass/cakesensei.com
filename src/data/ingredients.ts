@@ -62,13 +62,14 @@ export const ingredientsDatabase: Ingredient[] = [
   //           coffee/tea, spirits
   // ─────────────────────────────────────────────────────────────
   // Dairy milks
-  { id:'milk-whole',       name:'Whole Milk',              category:'liquid',    calories:61,  protein:3.2,  fat:3.3,  carbs:4.8,  sugar:5.1,  fiber:0.0,  sodium:43,    moisture:88, defaultAmount:120 },
-  { id:'milk-2pct',        name:'2% Milk',                 category:'liquid',    calories:50,  protein:3.4,  fat:2.0,  carbs:4.9,  sugar:5.1,  fiber:0.0,  sodium:44,    moisture:90, defaultAmount:120 },
-  { id:'milk-skim',        name:'Skim Milk',               category:'liquid',    calories:34,  protein:3.4,  fat:0.1,  carbs:5.0,  sugar:5.1,  fiber:0.0,  sodium:45,    moisture:91, defaultAmount:120 },
-  { id:'milk-buttermilk',  name:'Buttermilk',              category:'liquid',    calories:40,  protein:3.3,  fat:0.9,  carbs:4.8,  sugar:4.8,  fiber:0.0,  sodium:105,   moisture:90, defaultAmount:120 },
-  { id:'milk-half-half',   name:'Half and Half',           category:'liquid',    calories:130, protein:3.0,  fat:11.5, carbs:4.3,  sugar:4.3,  fiber:0.0,  sodium:41,    moisture:80, defaultAmount:120 },
-  { id:'cream-heavy',      name:'Heavy Cream',             category:'liquid',    calories:345, protein:2.8,  fat:36.1, carbs:2.8,  sugar:3.3,  fiber:0.0,  sodium:38,    moisture:57, defaultAmount:120 },
-  { id:'cream-whipping',   name:'Whipping Cream',          category:'liquid',    calories:292, protein:2.2,  fat:30.9, carbs:2.8,  sugar:3.3,  fiber:0.0,  sodium:38,    moisture:63, defaultAmount:120 },
+  // Dairy milks — saturated & trans (incl. natural ruminant trans) per 100g, USDA-style
+  { id:'milk-whole',       name:'Whole Milk',              category:'liquid',    calories:61,  protein:3.2,  fat:3.3,  saturatedFat:1.9,  transFat:0.07, polyunsaturatedFat:0.1, monounsaturatedFat:0.8,  cholesterol:10,  carbs:4.8,  sugar:5.1,  fiber:0.0,  sodium:43,    moisture:88, defaultAmount:120 },
+  { id:'milk-2pct',        name:'2% Milk',                 category:'liquid',    calories:50,  protein:3.4,  fat:2.0,  saturatedFat:1.2,  transFat:0.05, polyunsaturatedFat:0.1, monounsaturatedFat:0.5,  cholesterol:8,   carbs:4.9,  sugar:5.1,  fiber:0.0,  sodium:44,    moisture:90, defaultAmount:120 },
+  { id:'milk-skim',        name:'Skim Milk',               category:'liquid',    calories:34,  protein:3.4,  fat:0.1,  saturatedFat:0.1,  transFat:0.02, polyunsaturatedFat:0.0, monounsaturatedFat:0.0,  cholesterol:2,   carbs:5.0,  sugar:5.1,  fiber:0.0,  sodium:45,    moisture:91, defaultAmount:120 },
+  { id:'milk-buttermilk',  name:'Buttermilk',              category:'liquid',    calories:40,  protein:3.3,  fat:0.9,  saturatedFat:0.5,  transFat:0.04, polyunsaturatedFat:0.1, monounsaturatedFat:0.3,  cholesterol:4,   carbs:4.8,  sugar:4.8,  fiber:0.0,  sodium:105,   moisture:90, defaultAmount:120 },
+  { id:'milk-half-half',   name:'Half and Half',           category:'liquid',    calories:130, protein:3.0,  fat:11.5, saturatedFat:7.0,  transFat:0.35, polyunsaturatedFat:0.4, monounsaturatedFat:3.0,  cholesterol:35,  carbs:4.3,  sugar:4.3,  fiber:0.0,  sodium:41,    moisture:80, defaultAmount:120 },
+  { id:'cream-heavy',      name:'Heavy Cream',             category:'liquid',    calories:345, protein:2.8,  fat:36.1, saturatedFat:23.0, transFat:1.2,  polyunsaturatedFat:1.4, monounsaturatedFat:8.8,  cholesterol:137, carbs:2.8,  sugar:3.3,  fiber:0.0,  sodium:38,    moisture:57, defaultAmount:120 },
+  { id:'cream-whipping',   name:'Whipping Cream',          category:'liquid',    calories:292, protein:2.2,  fat:30.9, saturatedFat:19.0, transFat:1.0,  polyunsaturatedFat:1.2, monounsaturatedFat:7.5,  cholesterol:110, carbs:2.8,  sugar:3.3,  fiber:0.0,  sodium:38,    moisture:63, defaultAmount:120 },
   // Plant milks
   { id:'milk-oat',         name:'Oat Milk',                category:'liquid',    calories:45,  protein:1.0,  fat:1.5,  carbs:7.5,  sugar:4.0,  fiber:0.5,  sodium:50,    moisture:90, defaultAmount:120 },
   { id:'milk-almond',      name:'Almond Milk',             category:'liquid',    calories:17,  protein:0.6,  fat:1.1,  carbs:1.4,  sugar:0.8,  fiber:0.3,  sodium:72,    moisture:96, defaultAmount:120 },

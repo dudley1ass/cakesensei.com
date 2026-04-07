@@ -45,8 +45,14 @@ body {
     display: block !important;
   }
 
-  /* Page break hints */
+  /* Long recipe cards may span pages; avoid only very small UI bits */
   .bg-white.rounded-2xl {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  /* FDA-style nutrition panel: keep the box intact when possible */
+  .print-nutrition-label {
     break-inside: avoid;
     page-break-inside: avoid;
   }

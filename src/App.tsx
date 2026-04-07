@@ -930,10 +930,10 @@ export default function App() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 print:flex print:flex-col">
 
           {/* LEFT — Cake + Icing editors stacked */}
-          <div className="space-y-6">
+          <div className="space-y-6 print:order-1 print:break-after-page">
 
           {/* ── Cake Ingredient Editor ── */}
           <div className="bg-white rounded-2xl shadow-md p-5">
@@ -979,14 +979,6 @@ export default function App() {
                     <div className="mt-2 space-y-2">
                       {/* Description */}
                       <p className="text-xs text-gray-400 italic px-1">{preset.description}</p>
-
-                      {/* Source badge */}
-                      {preset.source && (
-                        <div className="flex items-center gap-1.5 px-2 py-1 bg-amber-50 border border-amber-200 rounded-lg">
-                          <span className="text-xs">📜</span>
-                          <span className="text-xs text-amber-800 font-medium">{preset.source}</span>
-                        </div>
-                      )}
 
                       {/* Leavening note */}
                       {preset.leaveningNote && (
@@ -1243,8 +1235,8 @@ export default function App() {
           </div>
           </div>{/* end LEFT column */}
 
-          {/* RIGHT — Tabs */}
-          <div>
+          {/* RIGHT — Tabs (print: baking → nutrition → science) */}
+          <div className="print:flex print:flex-col print:gap-6 print:order-2">
             {/* Tab nav — hidden when printing */}
             <div className="flex bg-white rounded-2xl shadow-sm p-1 mb-4 print:hidden">
               {(['metrics', 'nutrition', 'baking'] as const).map((tab) => (
@@ -1260,7 +1252,7 @@ export default function App() {
             </div>
 
             {/* Tab content — active tab on screen; ALL tabs visible when printing */}
-            <div className={activeTab === 'metrics' ? 'block' : 'hidden print:block'}>
+            <div className={`${activeTab === 'metrics' ? 'block' : 'hidden print:block'} print:order-3`}>
               <MetricsDisplay
                 metrics={metrics}
                 icingMetrics={icingMetrics}
@@ -1268,7 +1260,7 @@ export default function App() {
                 measurementMode={mode}
               />
             </div>
-            <div className={activeTab === 'nutrition' ? 'block' : 'hidden print:block'}>
+            <div className={`${activeTab === 'nutrition' ? 'block' : 'hidden print:block'} print:order-2 print:break-after-page`}>
               <NutritionFacts
                 metrics={metrics}
                 icingMetrics={icingMetrics}
@@ -1277,7 +1269,7 @@ export default function App() {
                 servingsPerRecipe={servings}
               />
             </div>
-            <div className={activeTab === 'baking' ? 'block' : 'hidden print:block'}>
+            <div className={`${activeTab === 'baking' ? 'block' : 'hidden print:block'} print:order-1 print:break-after-page`}>
               <BakingInstructions
                 cakeTypeId={selectedType.id}
                 totalWeight={metrics.totalWeight}
