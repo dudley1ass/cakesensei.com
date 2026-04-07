@@ -250,13 +250,27 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
       acidName.includes('buttermilk') ||
       acidName.includes('sour cream') ||
       acidName.includes('greek yogurt') ||
+      acidName.includes('yogurt') ||
+      acidName.includes('ricotta') ||
+      acidName.includes('cream cheese') ||
       acidName.includes('lemon juice') ||
       acidName.includes('lime juice') ||
+      acidName.includes('orange juice') ||
+      acidName.includes('cranberry') ||
+      acidName.includes('pineapple juice') ||
       acidName.includes('white vinegar') ||
       acidName.includes('apple cider vinegar') ||
       acidName.includes('molasses') ||
+      acidName.includes('brown sugar') ||
+      acidName.includes('honey') ||
+      acidName.includes('maple syrup') ||
       acidName.includes('applesauce') ||
-      acidName.includes('cocoa powder (natural)')
+      acidName.includes('coffee') ||
+      acidName.includes('espresso') ||
+      acidName.includes('banana') ||
+      acidName.includes('cocoa powder (natural)') ||
+      acidName.includes('cacao') ||
+      (acidName.includes('chocolate') && acidName.includes('chip'))
     ) {
       acidicSupportWeight += w;
     }
@@ -346,7 +360,9 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
     if (ing.category === 'sugar') {
       if (w >= 800) tasteWarnings.push('🍬 That\'s not a cake, that\'s a sugar delivery vehicle with structural ambitions.');
       else if (w >= 500) tasteWarnings.push('🍬 Dentists in your area have mysteriously started smiling.');
-      else if (w >= 400) tasteWarnings.push('🍬 This cake is going to need its own insulin prescription.');
+      else if (w >= 400 && flourWeight > 0 && sugarWeight > flourWeight * 1.12) {
+        tasteWarnings.push('🍬 This cake is going to need its own insulin prescription.');
+      }
     }
 
     // Butter — over 400g is a lot
@@ -454,8 +470,9 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
     tasteWarnings.push('✨ No flour detected — this is intentional, right? Flourless cakes are amazing but structurally brave.');
   }
 
-  // Almost no liquid
-  if (liquidWeight < 20 && flourWeight > 100 && totalWeight > 300) {
+  // “Dry” batter check — count eggs & a little fat; butter-creamed cakes have almost no free liquid
+  const bakerHydrationEstimate = liquidWeight + eggWeight * 0.92 + fatWeight * 0.12;
+  if (bakerHydrationEstimate < 28 && flourWeight > 100 && totalWeight > 300) {
     tasteWarnings.push('🏜️ Very little liquid — this batter will be very stiff. Intentional (like shortbread) or worth double-checking?');
   }
 
@@ -490,7 +507,11 @@ export function calculateCakeMetrics(recipeIngredients: RecipeIngredient[]): Cak
   }
 
   if (bakingSodaWeight > 0) {
-    if ((acidicSupportWeight + creamOfTartarWeight) < bakingSodaWeight * 10) {
+    const acidBuffer = acidicSupportWeight + creamOfTartarWeight;
+    const minAcidRatio = 6;
+    const traceSodaWithPowder =
+      bakingPowderWeight > 0 && bakingSodaWeight <= 4 && bakingSodaWeight <= bakingPowderWeight;
+    if (bakingSodaWeight >= 2 && !traceSodaWithPowder && acidBuffer < bakingSodaWeight * minAcidRatio) {
       tasteWarnings.push('🧪 Baking soda present with weak acid support — crumb may yellow and taste soapy. Add acid (buttermilk/lemon/vinegar) or swap part to baking powder.');
     }
     if (creamOfTartarWeight > 0) {

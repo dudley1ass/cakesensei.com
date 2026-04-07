@@ -83,7 +83,7 @@ export function MetricsDisplay({ metrics, icingMetrics, combinedMetrics, measure
 
       {/* ── View toggle (only shown when icing is present) ── */}
       {hasIcing && (
-        <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+        <div className="flex bg-gray-100 rounded-xl p-1 gap-1 print:hidden">
           {(['cake', 'icing', 'combined'] as const).map((v) => (
             <button
               key={v}

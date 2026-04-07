@@ -72,7 +72,7 @@ export function NutritionFacts({
     <div className="space-y-4">
 
       {hasIcing && (
-        <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+        <div className="flex bg-gray-100 rounded-xl p-1 gap-1 print:hidden">
           {(['cake', 'icing', 'combined'] as const).map((v) => (
             <button key={v} onClick={() => setView(v)}
               className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${effectiveView === v ? 'bg-white text-red-600 shadow' : 'text-gray-500 hover:text-gray-800'}`}>

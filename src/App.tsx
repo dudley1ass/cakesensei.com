@@ -930,10 +930,20 @@ export default function App() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 print:flex print:flex-col">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 print:flex print:flex-col print-two-page-root">
 
-          {/* LEFT — Cake + Icing editors stacked */}
+          {/* LEFT — Cake + Icing + print-only baking steps (page 1) */}
           <div className="space-y-6 print:order-1 print:break-after-page">
+            {/* Print: recipe title + subtitle */}
+            <div className="hidden print:block border-b-2 border-gray-800 pb-4 mb-2">
+              <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
+                {selectedType.emoji} {selectedType.name}
+                {selectedRecipeName ? ` — ${selectedRecipeName}` : ''}
+              </h1>
+              {!selectedRecipeName && (
+                <p className="text-sm text-gray-600 mt-1">Base formula (customize below)</p>
+              )}
+            </div>
 
           {/* ── Cake Ingredient Editor ── */}
           <div className="bg-white rounded-2xl shadow-md p-5">
@@ -941,7 +951,7 @@ export default function App() {
               <h2 className="text-lg font-bold text-gray-900">🧪 Cake Ingredients</h2>
               <button
                 onClick={() => setShowAdd(true)}
-                className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-3 py-1.5 rounded-xl transition-colors"
+                className="print:hidden flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-3 py-1.5 rounded-xl transition-colors"
               >
                 <Plus className="w-4 h-4" /> Add
               </button>
@@ -949,7 +959,7 @@ export default function App() {
 
             {/* Recipe presets */}
             {selectedType.recipes.length > 0 && (
-              <div className="mb-4 pb-4 border-b border-gray-100">
+              <div className="mb-4 pb-4 border-b border-gray-100 print:hidden">
                 <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">📖 Load a Recipe</div>
                 <select
                   value={selectedRecipeName ?? ''}
@@ -1045,7 +1055,7 @@ export default function App() {
               {icingExpanded && icingRecipe.length > 0 && (
                 <button
                   onClick={() => { setIcingRecipe([]); setSelectedIcingType(null); setSelectedIcingName(null); }}
-                  className="flex items-center gap-1 bg-red-100 hover:bg-red-200 text-red-600 text-sm font-medium px-3 py-1.5 rounded-xl transition-colors"
+                  className="print:hidden flex items-center gap-1 bg-red-100 hover:bg-red-200 text-red-600 text-sm font-medium px-3 py-1.5 rounded-xl transition-colors"
                 >
                   🗑️ Delete Frosting
                 </button>
@@ -1137,7 +1147,7 @@ export default function App() {
 
                 {/* ── Coverage Calculator ── */}
                 {icingRecipe.length > 0 && (
-                  <div className="mb-4 pb-4 border-b border-gray-100 bg-pink-50 rounded-xl p-4">
+                  <div className="mb-4 pb-4 border-b border-gray-100 bg-pink-50 rounded-xl p-4 print:hidden">
                     <div className="text-xs font-bold text-pink-600 uppercase tracking-wide mb-3">📐 Coverage Calculator</div>
                     <div className="grid grid-cols-3 gap-2 mb-3">
                       <div>
@@ -1222,7 +1232,7 @@ export default function App() {
                 )}
 
                 {/* Add ingredient button — always at the bottom */}
-                <div className="mt-4 pt-3 border-t border-gray-100">
+                <div className="mt-4 pt-3 border-t border-gray-100 print:hidden">
                   <button
                     onClick={() => setShowAddIcing(true)}
                     className="flex items-center justify-center gap-1.5 w-full bg-pink-500 hover:bg-pink-600 text-white text-sm font-medium px-3 py-2 rounded-xl transition-colors"
@@ -1232,11 +1242,25 @@ export default function App() {
                 </div>
               </>
             )}
-          </div>
-          </div>{/* end LEFT column */}
 
-          {/* RIGHT — Tabs (print: baking → nutrition → science) */}
-          <div className="print:flex print:flex-col print:gap-6 print:order-2">
+          </div>{/* end icing panel */}
+
+            {/* Print page 1: baking steps (interactive copy stays in tab column) */}
+            <div className="hidden print:block">
+              <BakingInstructions
+                cakeTypeId={selectedType.id}
+                totalWeight={metrics.totalWeight}
+                servings={servings}
+                measurementMode={mode}
+                icingTypeId={selectedIcingType?.id ?? null}
+                icingName={selectedIcingName}
+                hasIcing={icingRecipe.length > 0}
+              />
+            </div>
+          </div>{/* end LEFT column (space-y-6) */}
+
+          {/* RIGHT — Tabs (screen); print: nutrition then science only — page 2 */}
+          <div className="print:flex print:flex-col print:gap-6 print:order-2 print:break-before-page">
             {/* Tab nav — hidden when printing */}
             <div className="flex bg-white rounded-2xl shadow-sm p-1 mb-4 print:hidden">
               {(['metrics', 'nutrition', 'baking'] as const).map((tab) => (
@@ -1252,7 +1276,7 @@ export default function App() {
             </div>
 
             {/* Tab content — active tab on screen; ALL tabs visible when printing */}
-            <div className={`${activeTab === 'metrics' ? 'block' : 'hidden print:block'} print:order-3`}>
+            <div className={`${activeTab === 'metrics' ? 'block' : 'hidden print:block'} print:order-2`}>
               <MetricsDisplay
                 metrics={metrics}
                 icingMetrics={icingMetrics}
@@ -1260,7 +1284,7 @@ export default function App() {
                 measurementMode={mode}
               />
             </div>
-            <div className={`${activeTab === 'nutrition' ? 'block' : 'hidden print:block'} print:order-2 print:break-after-page`}>
+            <div className={`${activeTab === 'nutrition' ? 'block' : 'hidden print:block'} print:order-1`}>
               <NutritionFacts
                 metrics={metrics}
                 icingMetrics={icingMetrics}
@@ -1269,7 +1293,7 @@ export default function App() {
                 servingsPerRecipe={servings}
               />
             </div>
-            <div className={`${activeTab === 'baking' ? 'block' : 'hidden print:block'} print:order-1 print:break-after-page`}>
+            <div className={`${activeTab === 'baking' ? 'block' : 'hidden'} print:hidden`}>
               <BakingInstructions
                 cakeTypeId={selectedType.id}
                 totalWeight={metrics.totalWeight}
